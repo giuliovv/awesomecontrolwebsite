@@ -10,30 +10,14 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const uniqueNames = new Set(); // Declare uniqueNames inside useEffect
-    const repoUrl = 'https://api.github.com/repos/guidosassaroli/controlcompanies/git/trees/main?recursive=1';
+    // Assuming your combined file is named all_data.json
+    const dataUrl = 'https://raw.githubusercontent.com/guidosassaroli/controlcompanies/main/data/all_data.json';
     
-    axios.get(repoUrl)
+    axios.get(dataUrl)
       .then(response => {
-        const files = response.data.tree.filter(file => file.path.startsWith('data/') && file.path.endsWith('.json'));
-        
-        const fetchData = async () => {
-          for (const file of files) {
-            if (file.path.endsWith('_data_structure.json')) {
-              continue;
-            }
-
-            const fileUrl = `https://raw.githubusercontent.com/guidosassaroli/controlcompanies/main/${file.path}`;
-            const fileData = await axios.get(fileUrl);
-
-            if (!uniqueNames.has(fileData.data.name)) {
-              uniqueNames.add(fileData.data.name); // Update the local set variable
-              setData(prevData => [...prevData, fileData.data]);
-            }
-          }
-        };
-
-        fetchData();
+        const combinedData = response.data;
+        const dataArray = Object.values(combinedData);
+        setData(dataArray);
       })
       .catch(error => {
         console.error('Error fetching data:', error);
